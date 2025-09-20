@@ -45,7 +45,7 @@ determine_install_dir() {
   done
   
   INSTALL_DIR="$HOME/.local/bin"
-  print_warning "No standard binary directories found in PATH. Installing to $INSTALL_DIR"
+  print_warning "No standard binary directories found. Installing to $INSTALL_DIR"
   print_warning "You may need to add $INSTALL_DIR to your PATH manually."
 }
 
@@ -57,7 +57,7 @@ if [ ! -d "$INSTALL_DIR" ]; then
   if [ -w "$(dirname "$INSTALL_DIR")" ]; then
     mkdir -p "$INSTALL_DIR" || error_exit "Failed to create directory $INSTALL_DIR"
   else
-    echo "This requires sudo privileges:"
+    echo "This requires sudo privileges to create $INSTALL_DIR"
     sudo mkdir -p "$INSTALL_DIR" || error_exit "Failed to create directory $INSTALL_DIR"
   fi
 fi
@@ -70,6 +70,10 @@ if [ ! -w "$INSTALL_DIR" ]; then
   print_warning "Installing to $INSTALL_DIR requires sudo privileges"
 fi
 
+if [ -f "$INSTALL_DIR/$SCRIPT_NAME" ]; then
+  echo "Updating existing installation of $SCRIPT_NAME"
+fi
+
 TEMP_FILE=$(mktemp)
 echo "Downloading $SCRIPT_NAME from repository..."
 curl -sL "$REPO_URL" -o "$TEMP_FILE" || error_exit "Failed to download $SCRIPT_NAME"
@@ -78,6 +82,7 @@ if [ ! -s "$TEMP_FILE" ]; then
   rm -f "$TEMP_FILE"
   error_exit "Downloaded file is empty. Check your internet connection or repository URL."
 fi
+
 
 if [ $NEED_SUDO -eq 1 ]; then
   sudo mv "$TEMP_FILE" "$INSTALL_DIR/$SCRIPT_NAME" || error_exit "Failed to install $SCRIPT_NAME"
@@ -89,7 +94,7 @@ fi
 
 if [ -x "$INSTALL_DIR/$SCRIPT_NAME" ]; then
   print_success "Successfully installed $SCRIPT_NAME to $INSTALL_DIR"
-  
+
   if [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
     print_warning "$INSTALL_DIR is not in your PATH. You may need to add it."
     echo "Suggested command to add to your shell profile (~/.bashrc, ~/.zshrc, etc.):"

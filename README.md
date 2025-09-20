@@ -11,13 +11,16 @@ Bash script to print directory tree and file contents, ignoring `.git` and respe
 
 ## Installation
 
-You can install `cat-folder` system-wide with:
+You can install `cat-folder` with a single command:
 
 ```bash
 curl -s https://raw.githubusercontent.com/sevensteves/cat-folder/main/install.sh | bash
-````
+```
 
-The script will place `cat-folder` into `/usr/local/bin` on Linux, or `/opt/homebrew/bin` on macOS if it exists.
+The script will automatically:
+- Install to `/opt/homebrew/bin` on macOS with Homebrew 
+- Install to `/usr/local/bin` on other macOS or Linux systems
+- Fall back to `$HOME/.local/bin` if other locations aren't accessible
 ## Usage
 
 ```bash

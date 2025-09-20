@@ -2,7 +2,7 @@
 set -e
 
 SCRIPT_NAME="cat-folder"
-REPO_URL="https://raw.githubusercontent.com/sevensteves/cat-folder/main/script/${SCRIPT_NAME}.sh"
+REPO_URL="https://raw.githubusercontent.com/sevensteves/cat-folder/main/${SCRIPT_NAME}.sh"
 
 # Default install dir
 INSTALL_DIR="/usr/local/bin"

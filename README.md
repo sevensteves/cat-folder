@@ -18,8 +18,6 @@ curl -s https://raw.githubusercontent.com/sevensteves/cat-folder/main/install.sh
 ````
 
 The script will place `cat-folder` into `/usr/local/bin` on Linux, or `/opt/homebrew/bin` on macOS if it exists.
-Both of these locations are typically already on your `$PATH`.
-
 ## Usage
 
 ```bash

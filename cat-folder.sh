@@ -52,12 +52,15 @@ for file in $FILES; do
     continue
   fi
 
-  if ! grep -Iq . "$file"; then
-    echo "Skipping binary file (by content): $file"
+  # safer MIME-based check
+  mime=$(file -b --mime-type -- "$file" 2>/dev/null)
+  if [[ -z "$mime" || "$mime" != text/* && "$mime" != */json && "$mime" != */xml ]]; then
+    echo "Skipping binary file (by mime: $mime): $file"
     continue
   fi
 
   echo "----- FILE: $file -----"
-  cat "$file"
+  # strip ANSI escape sequences just in case
+  sed -r $'s/\x1B\\[[0-9;]*[A-Za-z]//g' -- "$file"
   echo
 done

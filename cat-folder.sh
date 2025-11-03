@@ -35,25 +35,25 @@ fi
 echo "=========================================="
 echo
 
+# Gather file list
+if [ -f "$TARGET_DIR/.gitignore" ]; then
+  FILES=$(git -C "$TARGET_DIR" ls-files --exclude-standard --others --cached)
+else
+  FILES=$(find "$TARGET_DIR" -type f -not -path "*/.git/*")
+fi
+
 # List of binary extensions to skip
 BINARY_EXTS="png jpg jpeg gif bmp ico exe dll so bin pdf zip gz tar tgz xz 7z mp3 mp4 mov avi mkv webp"
 
-# Gather files safely (NUL-delimited)
-if [ -f "$TARGET_DIR/.gitignore" ]; then
-  git -C "$TARGET_DIR" ls-files -z --exclude-standard --others --cached
-else
-  find "$TARGET_DIR" -type f -not -path "*/.git/*" -print0
-fi |
-while IFS= read -r -d '' file; do
+for file in $FILES; do
   ext="${file##*.}"
   if echo "$BINARY_EXTS" | grep -wiq "$ext"; then
     echo "Skipping binary file (by extension): $file"
     continue
   fi
 
-  mime=$(file -b --mime-type -- "$file" 2>/dev/null)
-  if [[ -z "$mime" || "$mime" != text/* && "$mime" != */json && "$mime" != */xml ]]; then
-    echo "Skipping binary file (by mime: $mime): $file"
+  if ! grep -Iq . "$file"; then
+    echo "Skipping binary file (by content): $file"
     continue
   fi
 

@@ -19,8 +19,7 @@ if command -v tree >/dev/null 2>&1; then
   if [ -f "$TARGET_DIR/.gitignore" ]; then
     (
       cd "$TARGET_DIR" || exit 1
-      git ls-files --exclude-standard --others --cached \
-        | tree --fromfile -N --charset=ascii
+      git ls-files --exclude-standard --others --cached | tree --fromfile -N --charset=ascii
     )
   else
     tree -N -a --charset=ascii -I ".git" "$TARGET_DIR"
@@ -36,14 +35,28 @@ fi
 echo "=========================================="
 echo
 
-# Walk through files and show contents
+# Gather file list
 if [ -f "$TARGET_DIR/.gitignore" ]; then
   FILES=$(git -C "$TARGET_DIR" ls-files --exclude-standard --others --cached)
 else
   FILES=$(find "$TARGET_DIR" -type f -not -path "*/.git/*")
 fi
 
+# List of binary extensions to skip
+BINARY_EXTS="png jpg jpeg gif bmp ico exe dll so bin pdf zip gz tar tgz xz 7z mp3 mp4 mov avi mkv webp"
+
 for file in $FILES; do
+  ext="${file##*.}"
+  if echo "$BINARY_EXTS" | grep -wiq "$ext"; then
+    echo "Skipping binary file (by extension): $file"
+    continue
+  fi
+
+  if ! grep -Iq . "$file"; then
+    echo "Skipping binary file (by content): $file"
+    continue
+  fi
+
   echo "----- FILE: $file -----"
   cat "$file"
   echo

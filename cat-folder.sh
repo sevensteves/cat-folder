@@ -58,9 +58,4 @@ for file in $FILES; do
     echo "Skipping binary file (by mime: $mime): $file"
     continue
   fi
-
-  echo "----- FILE: $file -----"
-  # strip ANSI escape sequences just in case
-  sed -r $'s/\x1B\\[[0-9;]*[A-Za-z]//g' -- "$file"
-  echo
 done

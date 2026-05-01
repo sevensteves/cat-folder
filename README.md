@@ -2,7 +2,7 @@
 
 **Dump your codebase into your clipboard, filtered and ready for LLMs.**
 
-`cat-folder` bridges the gap between your local files and ChatGPT/Claude. It generates a clean ASCII tree followed by file contents, automatically stripping noise like `node_modules` or lock files so you don't waste tokens.
+cat-folder bridges the gap between your local files and ChatGPT/Claude. It generates a clean ASCII tree followed by file contents, automatically stripping noise like node_modules or lock files so you don't waste tokens.
 
 ---
 
@@ -14,14 +14,14 @@
 curl -s https://raw.githubusercontent.com/sevensteves/cat-folder/main/install.sh | bash
 ```
 
-Installs to the right place automatically (Homebrew on macOS, `/usr/local/bin` on Linux). Prefer manual? Grab a binary from the [Releases page](https://github.com/sevensteves/cat-folder/releases) or run `go install github.com/sevensteves/cat-folder@latest`.
+Or grab a binary from the [Releases page](https://github.com/sevensteves/cat-folder/releases), or `go install github.com/sevensteves/cat-folder@latest`.
 
 ### 2. Run it
 
 | Goal | Command |
 | :--- | :--- |
-| Copy everything | `cat-folder . | pbcopy` |
-| Web project (strips noise) | `cat-folder --profile web . | pbcopy` |
+| Copy everything | `cat-folder . \| pbcopy` |
+| Web project (strips noise) | `cat-folder --profile web . \| pbcopy` |
 | Keep huge files in view | `cat-folder --profile web --max-lines 200 .` |
 | One-off exclusions | `cat-folder --profile web --ignore "*.snap" .` |
 | Combine profiles | `cat-folder --profile web --profile boilerplate .` |
@@ -56,20 +56,28 @@ Profiles are composable: `cat-folder --profile web --profile boilerplate .`
 <details>
 <summary><code>web</code> full pattern list</summary>
 
-**Directories:** `node_modules`, `.next`, `.nuxt`, `dist`, `build`, `out`, `.output`, `.cache`, `.turbo`, `coverage`, `__pycache__`, `.venv`, `venv`
+```
+node_modules  .next       .nuxt     dist        build
+out           .output     .cache    .turbo      coverage
+__pycache__   .venv       venv
 
-**Lock files:** `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`, `bun.lockb`, `poetry.lock`, and more
+package-lock.json   yarn.lock   pnpm-lock.yaml
+bun.lockb           poetry.lock composer.lock
 
-**Generated:** `*.min.js`, `*.min.css`, `*.map`, `*.tsbuildinfo`
-
-**Noise:** `*.log`, `.DS_Store`, `.env.local`
+*.min.js  *.min.css  *.map  *.tsbuildinfo
+*.log     .DS_Store  .env.local
+```
 
 </details>
 
 <details>
 <summary><code>boilerplate</code> full pattern list</summary>
 
-`next-env.d.ts`, `*.snap`, `*.generated.ts`, `*.generated.tsx`, `__generated__`, `storybook-static`, `public/next.svg`, `public/vercel.svg`, and other default framework SVGs
+```
+next-env.d.ts       *.snap              *.generated.ts
+*.generated.tsx     __generated__       storybook-static
+public/next.svg     public/vercel.svg
+```
 
 </details>
 

@@ -8,11 +8,12 @@ linters:
     - ineffassign
     - misspell
     - godot
+  exclusions:
+    rules:
+      - path: _test\.go
+        linters:
+          - errcheck
 
 issues:
-  exclude-rules:
-    - path: _test\.go
-      linters:
-        - errcheck
   max-issues-per-linter: 0
   max-same-issues: 0

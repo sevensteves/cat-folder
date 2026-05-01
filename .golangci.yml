@@ -8,6 +8,11 @@ linters:
     - ineffassign
     - misspell
     - godot
+  settings:
+    errcheck:
+      exclude-functions:
+        - fmt.Fprintf
+        - (*os.File).Close
   exclusions:
     rules:
       - path: _test\.go

@@ -1,6 +1,6 @@
 # cat-folder
 
-**Dump your codebase into your clipboard — filtered, truncated, and ready for LLMs.**
+**Dump your codebase into your clipboard, filtered and ready for LLMs.**
 
 ```bash
 # Install, then copy your web project in one go
@@ -20,14 +20,14 @@ cat-folder --profile web . | pbcopy
 curl -s https://raw.githubusercontent.com/sevensteves/cat-folder/main/install.sh | bash
 ```
 
-Installs to the right place automatically — Homebrew on macOS, `/usr/local/bin` on Linux. Prefer manual? Grab a binary from the [Releases page](https://github.com/sevensteves/cat-folder/releases) or `go install github.com/sevensteves/cat-folder@latest`.
+Installs to the right place automatically (Homebrew on macOS, `/usr/local/bin` on Linux). Prefer manual? Grab a binary from the [Releases page](https://github.com/sevensteves/cat-folder/releases) or run `go install github.com/sevensteves/cat-folder@latest`.
 
 ### 2. Run it
 
 | Goal | Command |
 | :--- | :--- |
-| Copy everything | `cat-folder . \| pbcopy` |
-| Web project (strips noise) | `cat-folder --profile web . \| pbcopy` |
+| Copy everything | `cat-folder . | pbcopy` |
+| Web project (strips noise) | `cat-folder --profile web . | pbcopy` |
 | Keep huge files in view | `cat-folder --profile web --max-lines 200 .` |
 | One-off exclusions | `cat-folder --profile web --ignore "*.snap" .` |
 | Combine profiles | `cat-folder --profile web --profile boilerplate .` |
@@ -36,15 +36,13 @@ Installs to the right place automatically — Homebrew on macOS, `/usr/local/bin
 
 ## Options
 
-```
-cat-folder [OPTIONS] <path>
-```
+Usage: `cat-folder [OPTIONS] <path>`
 
 | Flag | Description |
 |------|-------------|
-| `--profile <name>` | `web` \| `boilerplate` \| `default` — repeatable |
+| `--profile <name>` | Profile to apply: web, boilerplate, default (repeatable) |
 | `--max-lines <n>` | Truncate files longer than n lines |
-| `--ignore <pattern>` | Extra glob to exclude — repeatable |
+| `--ignore <pattern>` | Extra glob to exclude (repeatable) |
 | `--no-catignore` | Skip `.catignore` even if present |
 | `--version` | Print version |
 | `-h, --help` | Print usage |
@@ -54,15 +52,15 @@ cat-folder [OPTIONS] <path>
 ## Profiles
 
 | Profile | What it strips |
-|---------|---------------|
-| `default` | Nothing — original behavior |
-| `web` | `node_modules`, lock files, build output, generated assets |
+|---------|----------------|
+| `default` | Nothing, original behavior |
+| `web` | node_modules, lock files, build output, generated assets |
 | `boilerplate` | Next.js boilerplate, snapshots, generated types, Storybook |
 
 Profiles are composable: `cat-folder --profile web --profile boilerplate .`
 
 <details>
-<summary><code>web</code> — full pattern list</summary>
+<summary><code>web</code> full pattern list</summary>
 
 **Directories:** `node_modules`, `.next`, `.nuxt`, `dist`, `build`, `out`, `.output`, `.cache`, `.turbo`, `coverage`, `__pycache__`, `.venv`, `venv`
 
@@ -75,7 +73,7 @@ Profiles are composable: `cat-folder --profile web --profile boilerplate .`
 </details>
 
 <details>
-<summary><code>boilerplate</code> — full pattern list</summary>
+<summary><code>boilerplate</code> full pattern list</summary>
 
 `next-env.d.ts`, `*.snap`, `*.generated.ts`, `*.generated.tsx`, `__generated__`, `storybook-static`, `public/next.svg`, `public/vercel.svg`, and other default framework SVGs
 
@@ -85,7 +83,7 @@ Profiles are composable: `cat-folder --profile web --profile boilerplate .`
 
 ## .catignore
 
-Drop a `.catignore` in your project root for per-project exclusions. Loaded automatically every run unless you pass `--no-catignore`. Syntax follows `.gitignore` — blank lines and `#` comments are ignored.
+Drop a `.catignore` in your project root for per-project exclusions. Loaded automatically every run unless you pass `--no-catignore`. Syntax follows `.gitignore` (blank lines and `#` comments are ignored).
 
 ```gitignore
 # test and story noise

@@ -2,12 +2,6 @@
 
 **Dump your codebase into your clipboard, filtered and ready for LLMs.**
 
-```bash
-# Install, then copy your web project in one go
-curl -s https://raw.githubusercontent.com/sevensteves/cat-folder/main/install.sh | bash
-cat-folder --profile web . | pbcopy
-```
-
 `cat-folder` bridges the gap between your local files and ChatGPT/Claude. It generates a clean ASCII tree followed by file contents, automatically stripping noise like `node_modules` or lock files so you don't waste tokens.
 
 ---

@@ -1,0 +1,10 @@
+# Build output
+cat-folder
+
+# Go toolchain
+*.test
+*.out
+
+# OS noise
+.DS_Store
+Thumbs.db

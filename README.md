@@ -1,48 +1,40 @@
 # cat-folder
 
-Dump any codebase into your clipboard — ready to paste into an LLM.
+**Dump your codebase into your clipboard — filtered, truncated, and ready for LLMs.**
 
 ```bash
+# Install, then copy your web project in one go
 curl -s https://raw.githubusercontent.com/sevensteves/cat-folder/main/install.sh | bash
-```
-
-```bash
 cat-folder --profile web . | pbcopy
 ```
 
-One command. Clean tree + file contents. Noise filtered out automatically so the model sees signal, not lock files.
+`cat-folder` bridges the gap between your local files and ChatGPT/Claude. It generates a clean ASCII tree followed by file contents, automatically stripping noise like `node_modules` or lock files so you don't waste tokens.
 
 ---
 
-## Why cat-folder?
+## Quick start
 
-You already copy-paste code into ChatGPT or Claude. `cat-folder` makes that instant — and smart.
-
-**No lock files.** The `web` profile strips `node_modules`, lock files, and build output automatically.
-
-**No context blown on noise.** `--max-lines` keeps huge files in view without eating your token budget.
-
-**No setup per project.** Drop a `.catignore` next to `.gitignore` and it just works, every run.
-
-**Always accurate.** Walks the real filesystem — no stale snapshots, no git staging surprises.
-
----
-
-## Installation
-
-macOS and Linux — one line:
+### 1. Install
 
 ```bash
 curl -s https://raw.githubusercontent.com/sevensteves/cat-folder/main/install.sh | bash
 ```
 
-Installs to the right place automatically — Homebrew on macOS, `/usr/local/bin` on Linux.
+Installs to the right place automatically — Homebrew on macOS, `/usr/local/bin` on Linux. Prefer manual? Grab a binary from the [Releases page](https://github.com/sevensteves/cat-folder/releases) or `go install github.com/sevensteves/cat-folder@latest`.
 
-Prefer manual? Grab a binary from the [Releases page](https://github.com/sevensteves/cat-folder/releases) or install with `go install github.com/sevensteves/cat-folder@latest`.
+### 2. Run it
+
+| Goal | Command |
+| :--- | :--- |
+| Copy everything | `cat-folder . \| pbcopy` |
+| Web project (strips noise) | `cat-folder --profile web . \| pbcopy` |
+| Keep huge files in view | `cat-folder --profile web --max-lines 200 .` |
+| One-off exclusions | `cat-folder --profile web --ignore "*.snap" .` |
+| Combine profiles | `cat-folder --profile web --profile boilerplate .` |
 
 ---
 
-## Usage
+## Options
 
 ```
 cat-folder [OPTIONS] <path>

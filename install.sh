@@ -101,7 +101,8 @@ if [ -x "$INSTALL_DIR/$SCRIPT_NAME" ]; then
     echo "  export PATH=\"\$PATH:$INSTALL_DIR\""
   fi
   
-  print_success "Run '$SCRIPT_NAME /path/to/dir' to get started."
+  print_success "Run '$SCRIPT_NAME --profile web --max-lines 200 /path/to/dir' to get started."
+  echo "Use '$SCRIPT_NAME --help' to see profile, ignore, and .catignore options."
 else
   error_exit "Installation verification failed. Please check permissions and try again."
 fi

@@ -2,6 +2,7 @@ package walker
 
 import (
 	"bytes"
+	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -88,6 +89,7 @@ func Walk(opts Options) ([]File, Stats, error) {
 		// Read file content
 		content, err := os.ReadFile(path)
 		if err != nil {
+			fmt.Fprintf(os.Stderr, "warning: could not read %s: %v\n", rel, err)
 			stats.Binary++
 			return nil
 		}

@@ -12,7 +12,7 @@ import (
 	"github.com/sevensteves/cat-folder/internal/walker"
 )
 
-const version = "0.1.0"
+var version = "dev"
 
 func main() {
 	args := os.Args[1:]

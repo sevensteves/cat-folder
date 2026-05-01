@@ -1,74 +1,91 @@
 # cat-folder
 
-`cat-folder` prints a directory tree and file contents to stdout so you can pipe a project snapshot into the clipboard and paste it into an LLM chat. It always ignores `.git`, respects `.gitignore` when present, and now supports reusable exclusion profiles, per-project `.catignore` rules, and optional file truncation.
+**Dump your codebase into your clipboard, filtered and ready for LLMs.**
 
-## Features
+cat-folder bridges the gap between your local files and ChatGPT/Claude. It generates a clean ASCII tree followed by file contents, automatically stripping noise like node_modules or lock files so you don't waste tokens.
 
-- Shows a clean ASCII directory tree.
-- Respects `.gitignore` when present by using `git ls-files`.
-- Supports baked-in profiles with `--profile`.
-- Loads project-specific ignore globs from `.catignore` by default.
-- Lets you stack repeatable `--ignore` globs at runtime.
-- Truncates long files with `--max-lines` instead of dropping them entirely.
-- Prints a summary footer with shown, truncated, ignored, and skipped counts.
+---
 
-## Installation
+## Quick start
 
-You can install `cat-folder` with a single command:
+### 1. Install
 
 ```bash
 curl -s https://raw.githubusercontent.com/sevensteves/cat-folder/main/install.sh | bash
 ```
 
-The script will automatically:
-- Install to `/opt/homebrew/bin` on macOS with Homebrew
-- Install to `/usr/local/bin` on other macOS or Linux systems
-- Fall back to `$HOME/.local/bin` if other locations aren't accessible
+Or grab a binary from the [Releases page](https://github.com/sevensteves/cat-folder/releases), or `go install github.com/sevensteves/cat-folder@latest`.
 
-## Usage
+### 2. Run it
 
-```bash
-cat-folder [OPTIONS] <path>
+| Goal | Command |
+| :--- | :--- |
+| Copy everything | `cat-folder . \| pbcopy` |
+| Web project (strips noise) | `cat-folder --profile web . \| pbcopy` |
+| Keep huge files in view | `cat-folder --profile web --max-lines 200 .` |
+| One-off exclusions | `cat-folder --profile web --ignore "*.snap" .` |
+| Combine profiles | `cat-folder --profile web --profile boilerplate .` |
+
+---
+
+## Options
+
+Usage: `cat-folder [OPTIONS] <path>`
+
+| Flag | Description |
+|------|-------------|
+| `--profile <name>` | Profile to apply: web, boilerplate, default (repeatable) |
+| `--max-lines <n>` | Truncate files longer than n lines |
+| `--ignore <pattern>` | Extra glob to exclude (repeatable) |
+| `--no-catignore` | Skip `.catignore` even if present |
+| `--version` | Print version |
+| `-h, --help` | Print usage |
+
+---
+
+## Profiles
+
+| Profile | What it strips |
+|---------|----------------|
+| `default` | Nothing, original behavior |
+| `web` | node_modules, lock files, build output, generated assets |
+| `boilerplate` | Next.js boilerplate, snapshots, generated types, Storybook |
+
+Profiles are composable: `cat-folder --profile web --profile boilerplate .`
+
+<details>
+<summary><code>web</code> full pattern list</summary>
+
+```
+node_modules  .next       .nuxt     dist        build
+out           .output     .cache    .turbo      coverage
+__pycache__   .venv       venv
+
+package-lock.json   yarn.lock   pnpm-lock.yaml
+bun.lockb           poetry.lock composer.lock
+
+*.min.js  *.min.css  *.map  *.tsbuildinfo
+*.log     .DS_Store  .env.local
 ```
 
-### Options
+</details>
 
-```bash
---profile <name>     web | default  (default: default)
---max-lines <n>      truncate files longer than n lines
---ignore <pattern>   extra glob to exclude (repeatable)
---no-catignore       skip .catignore even if present
--h, --help           print usage
+<details>
+<summary><code>boilerplate</code> full pattern list</summary>
+
+```
+next-env.d.ts       *.snap              *.generated.ts
+*.generated.tsx     __generated__       storybook-static
+public/next.svg     public/vercel.svg
 ```
 
-### Profiles
+</details>
 
-`default` keeps the original behavior and adds no extra filtering.
+---
 
-`web` excludes common web-project noise:
+## .catignore
 
-- Directories: `node_modules`, `.next`, `.nuxt`, `dist`, `build`, `out`, `.output`, `.cache`, `.parcel-cache`, `.turbo`, `coverage`, `.nyc_output`, `__pycache__`, `.pytest_cache`, `.venv`, `venv`
-- Lock files and build metadata: `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`, `bun.lockb`, `composer.lock`, `Gemfile.lock`, `Pipfile.lock`, `poetry.lock`, `*.tsbuildinfo`
-- Generated files: `*.min.js`, `*.min.css`, `*.map`
-- Noise: `*.log`, `.DS_Store`, `Thumbs.db`, `.env.local`, `.env.*.local`
-
-Example:
-
-```bash
-cat-folder --profile web /path/to/project
-```
-
-### `.catignore`
-
-If the target directory contains a `.catignore` file, `cat-folder` loads it automatically on every run unless you pass `--no-catignore`.
-
-Syntax matches the basics of `.gitignore`:
-
-- Blank lines are ignored.
-- Lines starting with `#` are treated as comments.
-- Every other line is treated as a glob pattern.
-
-Example `.catignore`:
+Drop a `.catignore` in your project root for per-project exclusions. Loaded automatically every run unless you pass `--no-catignore`. Syntax follows `.gitignore` (blank lines and `#` comments are ignored).
 
 ```gitignore
 # test and story noise
@@ -77,71 +94,53 @@ __tests__
 src/generated
 ```
 
-The `.catignore` file itself is never printed.
-
-### Extra one-off ignores
-
-Use `--ignore` to add extra globs without changing the repo:
-
-```bash
-cat-folder --profile web --ignore "*.snap" --ignore "docs/generated" /path/to/project
-```
-
-### Truncating long files
-
-Use `--max-lines` to keep the top of long files and append a truncation note:
-
-```bash
-cat-folder --profile web --max-lines 200 /path/to/project
-```
-
-For a file longer than the limit, the output ends with:
-
-```text
-... [truncated: showing N of TOTAL lines] ...
-```
-
-### Summary footer
-
-After printing files, `cat-folder` reports:
-
-- Active profile
-- Number of `.catignore` patterns loaded, if any
-- Files shown
-- Files truncated, if `--max-lines` was used and truncation occurred
-- Files ignored by profile or `.catignore` rules
-- Binary files skipped
+---
 
 ## Examples
 
 ```bash
-cat-folder .
-cat-folder --profile web .
-cat-folder --profile web --max-lines 150 .
+# Paste a whole project into Claude (macOS)
+cat-folder --profile web . | pbcopy
+
+# Keep huge files without blowing context
+cat-folder --profile web --max-lines 200 .
+
+# One-off exclusions without touching the repo
 cat-folder --profile web --ignore "*.snap" --ignore "storybook-static" .
+
+# Combine profiles and truncation
+cat-folder --profile web --profile boilerplate --max-lines 150 .
+
+# Skip .catignore for a clean run
 cat-folder --profile default --no-catignore .
 ```
 
-## Example Output
+---
 
-```text
-===== Directory Tree =====
-README.md
-src
-|-- main.ts
-`-- utils.ts
-==========
+## Example output
 
------ FILE: README.md -----
-# Example Project
+```
+===== Directory Tree for . =====
+|-- src
+|   |-- main.ts
+|   `-- utils.ts
+`-- README.md
+==========================================
 
 ----- FILE: src/main.ts -----
 console.log('hello')
+# ... rest of file
 
-==========
-Profile: web
-.catignore patterns loaded: 2
-Files shown: 2
-Files ignored: 5
-Binary files skipped: 0
+==========================================
+Summary:
+  Profiles : web
+  Shown    : 2 file(s)
+  Ignored  : 5 file(s) (profile/catignore rules)
+==========================================
 ```
+
+---
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md). Bug reports and PRs are welcome.

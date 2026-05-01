@@ -115,6 +115,7 @@ profile_web=(
   "Gemfile.lock"
   "Pipfile.lock"
   "poetry.lock"
+  "*.tsbuildinfo"
   "*.min.js"
   "*.min.css"
   "*.map"

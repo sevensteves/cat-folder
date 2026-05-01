@@ -48,7 +48,7 @@ cat-folder [OPTIONS] <path>
 `web` excludes common web-project noise:
 
 - Directories: `node_modules`, `.next`, `.nuxt`, `dist`, `build`, `out`, `.output`, `.cache`, `.parcel-cache`, `.turbo`, `coverage`, `.nyc_output`, `__pycache__`, `.pytest_cache`, `.venv`, `venv`
-- Lock files: `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`, `bun.lockb`, `composer.lock`, `Gemfile.lock`, `Pipfile.lock`, `poetry.lock`
+- Lock files and build metadata: `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`, `bun.lockb`, `composer.lock`, `Gemfile.lock`, `Pipfile.lock`, `poetry.lock`, `*.tsbuildinfo`
 - Generated files: `*.min.js`, `*.min.css`, `*.map`
 - Noise: `*.log`, `.DS_Store`, `Thumbs.db`, `.env.local`, `.env.*.local`
 

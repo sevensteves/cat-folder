@@ -15,12 +15,10 @@ jobs:
     name: auto-tag
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     outputs:
       new_tag: ${{ steps.bump.outputs.new_tag }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -46,14 +44,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: tag
     if: always() && (github.ref_type == 'tag' || needs.tag.result == 'success')
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
           go-version: '1.22'
           cache: false

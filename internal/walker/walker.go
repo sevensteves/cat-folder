@@ -59,8 +59,8 @@ func Walk(opts Options) ([]File, Stats, error) {
 			return filepath.SkipDir
 		}
 
-		// Never print .catignore file
-		if !d.IsDir() && d.Name() == ".catignore" {
+		// Never print .catignore or .gitignore files
+		if !d.IsDir() && (d.Name() == ".catignore" || d.Name() == ".gitignore") {
 			stats.Ignored++
 			return nil
 		}

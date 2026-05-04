@@ -9,7 +9,7 @@ import (
 )
 
 func TestIgnored_ProfileWeb_NodeModules(t *testing.T) {
-	f, _, err := filter.New([]string{"web"}, nil, t.TempDir(), false)
+	f, _, _, err := filter.New([]string{"web"}, nil, t.TempDir(), false, false)
 	if err != nil {
 		t.Fatalf("New() error: %v", err)
 	}
@@ -40,7 +40,7 @@ func TestIgnored_Catignore(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	f, count, err := filter.New([]string{"default"}, nil, dir, true)
+	f, count, _, err := filter.New([]string{"default"}, nil, dir, true, false)
 	if err != nil {
 		t.Fatalf("New() error: %v", err)
 	}
@@ -60,8 +60,34 @@ func TestIgnored_Catignore(t *testing.T) {
 }
 
 func TestUnknownProfile(t *testing.T) {
-	_, _, err := filter.New([]string{"nonexistent"}, nil, t.TempDir(), false)
+	_, _, _, err := filter.New([]string{"nonexistent"}, nil, t.TempDir(), false, false)
 	if err == nil {
 		t.Fatal("expected error for unknown profile, got nil")
+	}
+}
+
+func TestIgnored_Gitignore(t *testing.T) {
+	dir := t.TempDir()
+	gitignore := filepath.Join(dir, ".gitignore")
+	if err := os.WriteFile(gitignore, []byte("*.log\ndist\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	f, _, count, err := filter.New([]string{"default"}, nil, dir, false, true)
+	if err != nil {
+		t.Fatalf("New() error: %v", err)
+	}
+	if count != 2 {
+		t.Errorf("gitignore pattern count = %d, want 2", count)
+	}
+
+	if !f.Ignored("app.log") {
+		t.Error("expected app.log to be ignored")
+	}
+	if !f.Ignored("dist/bundle.js") {
+		t.Error("expected dist/bundle.js to be ignored")
+	}
+	if f.Ignored("main.go") {
+		t.Error("expected main.go not to be ignored")
 	}
 }

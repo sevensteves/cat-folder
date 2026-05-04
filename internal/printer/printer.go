@@ -13,6 +13,7 @@ type Options struct {
 	Root           string
 	Profiles       []string
 	CatignoreCount int
+	GitignoreCount int
 	MaxLines       int
 	Out            io.Writer
 }
@@ -117,6 +118,9 @@ func Summary(files []walker.File, stats walker.Stats, opts Options) {
 	fmt.Fprintf(opts.Out, "  Profiles : %s\n", strings.Join(opts.Profiles, ", "))
 	if opts.CatignoreCount > 0 {
 		fmt.Fprintf(opts.Out, "  .catignore: %d pattern(s) loaded\n", opts.CatignoreCount)
+	}
+	if opts.GitignoreCount > 0 {
+		fmt.Fprintf(opts.Out, "  .gitignore: %d pattern(s) loaded\n", opts.GitignoreCount)
 	}
 	fmt.Fprintf(opts.Out, "  Shown    : %d file(s)\n", stats.Shown)
 	if opts.MaxLines > 0 && stats.Truncated > 0 {

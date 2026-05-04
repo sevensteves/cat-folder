@@ -49,14 +49,14 @@ func (e UnknownProfileError) Error() string {
 	return fmt.Sprintf("unknown profile %q; available: %s", e.Name, strings.Join(names, ", "))
 }
 
-func New(profiles []string, extra []string, root string, useCatignore bool) (*Filter, int, error) {
+func New(profiles []string, extra []string, root string, useCatignore bool, useGitignore bool) (*Filter, int, int, error) {
 	var allPatterns []string
 
 	// Accumulate patterns from all profiles
 	for _, profile := range profiles {
 		patterns, ok := Profiles[profile]
 		if !ok {
-			return nil, 0, UnknownProfileError{Name: profile}
+			return nil, 0, 0, UnknownProfileError{Name: profile}
 		}
 		allPatterns = append(allPatterns, patterns...)
 	}
@@ -71,11 +71,22 @@ func New(profiles []string, extra []string, root string, useCatignore bool) (*Fi
 			catignoreCount = len(catignorePatterns)
 			allPatterns = append(allPatterns, catignorePatterns...)
 		} else if !os.IsNotExist(err) {
-			return nil, 0, err
+			return nil, 0, 0, err
 		}
 	}
 
-	return &Filter{patterns: allPatterns}, catignoreCount, nil
+	gitignoreCount := 0
+	if useGitignore {
+		gitignorePatterns, err := loadCatignore(filepath.Join(root, ".gitignore"))
+		if err == nil {
+			gitignoreCount = len(gitignorePatterns)
+			allPatterns = append(allPatterns, gitignorePatterns...)
+		} else if !os.IsNotExist(err) {
+			return nil, 0, 0, err
+		}
+	}
+
+	return &Filter{patterns: allPatterns}, catignoreCount, gitignoreCount, nil
 }
 
 func (f *Filter) Ignored(relPath string) bool {

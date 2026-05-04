@@ -12,7 +12,7 @@ import (
 
 func newFilter(t *testing.T) *filter.Filter {
 	t.Helper()
-	f, _, err := filter.New([]string{"default"}, nil, t.TempDir(), false)
+	f, _, _, err := filter.New([]string{"default"}, nil, t.TempDir(), false, false)
 	if err != nil {
 		t.Fatalf("filter.New() error: %v", err)
 	}
@@ -75,6 +75,29 @@ func TestWalk_Truncation(t *testing.T) {
 	}
 	if !files[0].Truncated {
 		t.Error("expected file.Truncated = true")
+	}
+}
+
+func TestWalk_SkipsCatignoreAndGitignore(t *testing.T) {
+	dir := t.TempDir()
+	write(t, filepath.Join(dir, "main.go"), "package main\n")
+	write(t, filepath.Join(dir, ".catignore"), "*.log\n")
+	write(t, filepath.Join(dir, ".gitignore"), "dist\n")
+
+	files, stats, err := walker.Walk(walker.Options{Root: dir, Filter: newFilter(t)})
+	if err != nil {
+		t.Fatalf("Walk() error: %v", err)
+	}
+	if stats.Shown != 1 {
+		t.Errorf("Shown = %d, want 1", stats.Shown)
+	}
+	if stats.Ignored != 2 {
+		t.Errorf("Ignored = %d, want 2", stats.Ignored)
+	}
+	for _, f := range files {
+		if f.RelPath == ".catignore" || f.RelPath == ".gitignore" {
+			t.Errorf("Walk() should not include %s", f.RelPath)
+		}
 	}
 }
 

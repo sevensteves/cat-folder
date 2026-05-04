@@ -20,6 +20,7 @@ func main() {
 	var profiles []string
 	var extraIgnores []string
 	useCatignore := true
+	useGitignore := true
 	var maxLines int
 	var targetDir string
 
@@ -96,6 +97,11 @@ func main() {
 			continue
 		}
 
+		if arg == "--no-gitignore" {
+			useGitignore = false
+			continue
+		}
+
 		if strings.HasPrefix(arg, "-") {
 			fmt.Fprintf(os.Stderr, "error: unknown flag %s\n", arg)
 			os.Exit(1)
@@ -119,7 +125,7 @@ func main() {
 	}
 
 	// Create filter
-	f, catignoreCount, err := filter.New(profiles, extraIgnores, targetDir, useCatignore)
+	f, catignoreCount, gitignoreCount, err := filter.New(profiles, extraIgnores, targetDir, useCatignore, useGitignore)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
@@ -141,6 +147,7 @@ func main() {
 		Root:           targetDir,
 		Profiles:       profiles,
 		CatignoreCount: catignoreCount,
+		GitignoreCount: gitignoreCount,
 		MaxLines:       maxLines,
 		Out:            os.Stdout,
 	}
@@ -160,6 +167,7 @@ Options:
   --max-lines <n>      truncate files longer than n lines
   --ignore <pattern>   extra glob to exclude (repeatable)
   --no-catignore       skip .catignore even if present
+  --no-gitignore       skip .gitignore even if present
   --version            print version
   -h, --help           print this message
 `)
